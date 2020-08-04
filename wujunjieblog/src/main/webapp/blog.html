@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Junjie Wu - Life is Now.</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="all,follow">
+    <!-- Bootstrap CSS-->
+    <link rel="stylesheet" href="vendor/bootstrap/css/bootstrap.min.css">
+    <!-- Font Awesome CSS-->
+    <link rel="stylesheet" href="vendor/font-awesome/css/font-awesome.min.css">
+    <!-- Custom icon font-->
+    <link rel="stylesheet" href="css/fontastic.css">
+    <!-- Google fonts - Open Sans-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700">
+    <!-- Fancybox-->
+    <link rel="stylesheet" href="vendor/@fancyapps/fancybox/jquery.fancybox.min.css">
+    <!-- theme stylesheet-->
+    <link rel="stylesheet" href="css/style.default.css" id="theme-stylesheet">
+    <!-- Custom stylesheet - for your changes-->
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="css/pagination.css">
+    <!-- Favicon-->
+    <link rel="shortcut icon" href="img/chis.jpg">
+    <script src="js/jquery3.4.1.js"></script>
+    <script src="js/jquery.pagination.js"></script>
+
+    <!-- Tweaks for older IEs--><!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+  </head>
+  <script>
+    $(function () {
+
+        //判断是走全部博客还是分类
+        var temp = getParam("typeContent");
+        if ( temp == null) {
+            //开启分页
+            var total=0;
+            page_blog(1,false);//让程序同步请求 以得到总记录数
+            $('.M-box').pagination({
+                totalData:total,
+                showData:4,
+                jump:true,
+                coping:true,
+                callback: function (api) {
+                    var page = api.getCurrent();
+                    page_blog(page,true);
+                }
+            });
+            function page_blog(pageNum,async) {
+                $("#pageBlog").html("");//清空之前的操作
+                var page = pageNum;
+                $.ajax({
+                    url:"blog/getAllBlog.do",
+                    type:"get",
+                    data:{pageNum:page,pageSize:4},
+                    dataType:"json",
+                    async:async,
+                    success:function (data) {
+                        total = data.total;//把总记录数赋值给全局变量
+                        $(data.list).each(function (index,blog) {
+                            $("#pageBlog").append(`<div class="post col-xl-6">
+                <div class="post-thumbnail"><a href="post.html?blogId=${blog.blogId}"><img src="img/blog-post-${index+1}.jpeg" alt="..." class="img-fluid"></a></div>
+                <div class="post-details">
+                  <div class="post-meta d-flex justify-content-between">
+
+                    <div class="category"><a href="#">${blog.type.typeContent}</a></div>
+                  </div><a href="post.html">
+                    <h3 class="h4">${blog.blogTitle}</h3></a>
+                  <footer class="post-footer d-flex align-items-center"><a href="#" class="author d-flex align-items-center flex-wrap">
+                      <div class="avatar"><img src="img/avatar-1.jpg" alt="..." class="img-fluid"></div>
+                      <div class="title"><span>${blog.blogAuthor}</span></div></a>
+                    <div class="date"><i class="icon-clock"></i>${blog.blogCreatetime} </div>
+                    <div class="comments meta-last"><i class="icon-comment"></i>${blog.blogComments}</div>
+                  </footer>
+                </div>
+              </div>`)
+                        })
+                    }
+
+
+                })
+
+            }
+
+        }
+        if (temp != null) {
+            //开启分页
+            var total=0;
+            $("#otherTitle").append(temp);
+            page_blog(1,false);//让程序同步请求 以得到总记录数
+            $('.M-box').pagination({
+                totalData:total,
+                showData:2,
+                jump:true,
+                coping:true,
+                callback: function (api) {
+                    var page = api.getCurrent();
+                    page_blog(page,true);
+                }
+            });
+
+            function page_blog(pageNum,async) {
+                $("#pageBlog").html("");//清空之前的操作
+                var page = pageNum;
+                var typeContent=getParam("typeContent");
+                $.ajax({
+                    url:"blog/getAllBlogByType.do",
+                    type:"get",
+                    data:{typeContent:typeContent,pageNum:page,pageSize:2},
+                    dataType:"json",
+                    async:async,
+                    success:function (data) {
+                        total = data.total;//把总记录数赋值给全局变量
+
+                        $(data.list).each(function (index,blog) {
+                            $("#pageBlog").append(`<div class="post col-xl-6">
+                <div class="post-thumbnail"><a href="post.html?blogId=${blog.blogId}"><img src="img/blog-post-${index+1}.jpeg" alt="..." class="img-fluid"></a></div>
+                <div class="post-details">
+                  <div class="post-meta d-flex justify-content-between">
+
+                    <div class="category"><a href="#">${blog.type.typeContent}</a></div>
+                  </div><a href="post.html">
+                    <h3 class="h4">${blog.blogTitle}</h3></a>
+                  <footer class="post-footer d-flex align-items-center"><a href="#" class="author d-flex align-items-center flex-wrap">
+                      <div class="avatar"><img src="img/avatar-1.jpg" alt="..." class="img-fluid"></div>
+                      <div class="title"><span>${blog.blogAuthor}</span></div></a>
+                    <div class="date"><i class="icon-clock"></i>${blog.blogCreatetime} </div>
+                    <div class="comments meta-last"><i class="icon-comment"></i>${blog.blogComments}</div>
+                  </footer>
+                </div>
+              </div>`)
+                        })
+                    }
+
+
+                })
+
+            }
+        }
+
+
+        //获得最新三条博客
+        $.ajax({
+            url:"/blog/getNewest.do",
+            type:"get",
+            async:true,
+            dataType:"json",
+            success:function (data) {
+                $(data).each(function (index,blog) {
+
+                    $("#threeNewBlog").append(`<a href="post.html?blogId=${blog.blogId}">
+                <div class="item d-flex align-items-center">
+                  <div class="image"><img src="img/small-thumbnail-${index+1}.jpg" alt="..." class="img-fluid"></div>
+                  <div class="title"><strong>${blog.blogTitle}</strong>
+                    <div class="d-flex align-items-center">
+                      <div class="views"><i class="icon-eye"></i> ${blog.blogView}</div>
+                      <div  class="comments"><i class="icon-comment"></i>${blog.blogComments}</div>
+                    </div>
+                  </div>
+                </div></a>`);
+
+                })
+
+            }
+
+
+        });
+        //分类目录
+        $.ajax({
+            url:"/blog/getBlogByType.do",
+            type:"get",
+            async:true,
+            dataType:"json",
+            success:function (data) {
+                $(data).each(function (index,blog) {
+                    $("#categories").append(`<div class="item d-flex justify-content-between"><a href="blog.html?typeContent=${blog.type.typeContent}">${blog.type.typeContent}</a><span>${blog.count}</span></div>`)
+                })
+            }
+        });
+        //标签目录
+        $.ajax({
+            url:"/blog/getAllBlogSign.do",
+            type:"get",
+            async:true,
+            dataType:"json",
+            success:function (data) {
+                $(data).each(function (index,blog) {
+                    $("#signs>ul").append(`<li class="list-inline-item"><a href="#" class="tag">#${blog.blogSign}</a></li>`)
+
+                })
+            }
+
+
+        });
+        //页面底部随机三条博客
+        $.ajax({
+            url:"/blog/getRanBlog.do",
+            type:"get",
+            async:true,
+            dataType:"json",
+            success:function (data) {
+                $(data).each(function (index,blog) {
+                    $("#downBlogs").append(` <a href="post.html?blogId=${blog.blogId}">
+                <div class="post d-flex align-items-center">
+                  <div class="image"><img src="img/small-thumbnail-${index+1}.jpg" alt="..." class="img-fluid"></div>
+                  <div class="title"><strong>${blog.blogTitle}</strong><span class="date last-meta">${blog.blogCreatetime}</span></div>
+                </div>
+              </a>`)
+                })
+            }
+        });
+
+    });
+
+    //获得博客id方法
+    function getParam(paramName) {
+        paramValue = "", isFound = !1;
+        if (this.location.search.indexOf("?") == 0 && this.location.search.indexOf("=") > 1) {
+            arrSource = unescape(this.location.search).substring(1, this.location.search.length).split("&"), i = 0;
+            while (i < arrSource.length && !isFound) arrSource[i].indexOf("=") > 0 && arrSource[i].split("=")[0].toLowerCase() == paramName.toLowerCase() && (paramValue = arrSource[i].split("=")[1], isFound = !0), i++
+        }
+        return paramValue == "" && (paramValue = null), paramValue
+    }
+  </script>
+  <body>
+    <header class="header">
+      <!-- Main Navbar-->
+      <nav class="navbar navbar-expand-lg">
+        <div class="search-area">
+          <div class="search-area-inner d-flex align-items-center justify-content-center">
+            <div class="close-btn"><i class="icon-close"></i></div>
+            <div class="row d-flex justify-content-center">
+              <div class="col-md-8">
+                <form action="#">
+                  <div class="form-group">
+                    <input type="search" name="search" id="search" placeholder="What are you looking for?">
+                    <button type="submit" class="submit"><i class="icon-search-1"></i></button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="container">
+          <!-- Navbar Brand -->
+          <div class="navbar-header d-flex align-items-center justify-content-between">
+            <!-- Navbar Brand --><a href="index.html" class="navbar-brand">WuJunjie Blog</a>
+            <!-- Toggle Button-->
+            <button type="button" data-toggle="collapse" data-target="#navbarcollapse" aria-controls="navbarcollapse" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler"><span></span><span></span><span></span></button>
+          </div>
+          <!-- Navbar Menu -->
+          <div id="navbarcollapse" class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+              <li class="nav-item"><a href="index.html" class="nav-link ">Home</a>
+              </li>
+              <li class="nav-item"><a href="blog.html" class="nav-link active ">Blog</a>
+              </li>
+              <li class="nav-item"><a href="post.html" class="nav-link ">Post</a>
+              </li>
+              <li class="nav-item"><a href="about.html" class="nav-link ">Contact</a>
+              </li>
+            </ul>
+            <div class="navbar-text"><a href="#" class="search-btn"><i class="icon-search-1"></i></a></div>
+            <ul class="langs navbar-text"><a href="#" class="active">EN</a><span>           </span><a href="#">ES</a></ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+    <div class="container">
+      <div class="row">
+        <!-- Latest Posts -->
+        <main class="posts-listing col-lg-8">
+          <div class="container" >
+            <h3 id="otherTitle" style="font-family: '微软雅黑 Light'">所有博客></h3>
+
+            <div class="row" id="pageBlog">
+
+
+              <!-- post -->
+
+            </div>
+            <!-- Pagination -->
+            <nav aria-label="Page navigation example">
+              <div class="m-style M-box" style="margin-left: 200px"></div>
+
+            </nav>
+          </div>
+        </main>
+        <aside class="col-lg-4">
+          <!-- Widget [Search Bar Widget]-->
+          <div class="widget search">
+            <header>
+              <h3 class="h6">搜索博客</h3>
+            </header>
+            <form action="#" class="search-form">
+              <div class="form-group">
+                <input type="search" placeholder="What are you looking for?">
+                <button type="submit" class="submit"><i class="icon-search"></i></button>
+              </div>
+            </form>
+          </div>
+          <!-- Widget [Latest Posts Widget]        -->
+          <div class="widget latest-posts">
+            <header>
+              <h3 class="h6">最新帖子</h3>
+            </header>
+            <div class="blog-posts" id="threeNewBlog">
+
+            </div>
+          </div>
+          <!-- Widget [Categories Widget]-->
+          <div class="widget categories" id="categories">
+            <header>
+              <h3 class="h6">分类目录</h3>
+            </header>
+
+          </div>
+          <!-- Widget [Tags Cloud Widget]-->
+          <div class="widget tags" id="signs">
+            <header>
+              <h3 class="h6">标签</h3>
+            </header>
+            <ul class="list-inline">
+
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <!-- Page Footer-->
+    <footer class="main-footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="logo">
+              <h6 class="text-white">Bootstrap Blog</h6>
+            </div>
+            <div class="contact-details">
+              <p>53 Broadway, Broklyn, NY 11249</p>
+              <p>Phone: (020) 123 456 789</p>
+              <p>Email: <a href="mailto:info@company.com">Info@Company.com</a></p>
+              <ul class="social-menu">
+                <li class="list-inline-item"><a href="#"><i class="fa fa-facebook"></i></a></li>
+                <li class="list-inline-item"><a href="#"><i class="fa fa-twitter"></i></a></li>
+                <li class="list-inline-item"><a href="#"><i class="fa fa-instagram"></i></a></li>
+                <li class="list-inline-item"><a href="#"><i class="fa fa-behance"></i></a></li>
+                <li class="list-inline-item"><a href="#"><i class="fa fa-pinterest"></i></a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="menus d-flex">
+                <ul class="list-unstyled">
+                    <li> <a href="javascript:">My Account</a></li>
+                    <li> <a href="javascript:">Add Listing</a></li>
+                    <li> <a href="javascript:">Pricing</a></li>
+                    <li> <a href="javascript:">Privacy &amp; Policy</a></li>
+                </ul>
+                <ul class="list-unstyled">
+                    <li> <a href="javascript:">Our Partners</a></li>
+                    <li> <a href="javascript:">FAQ</a></li>
+                    <li> <a href="javascript:">How It Works</a></li>
+                    <li> <a href="about.html">Contact</a></li>
+                </ul>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="latest-posts" id="downBlogs">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="copyrights">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-6">
+                <p>&copy; 2020. 赣ICP备20004168 All rights reserved.Your great site.</p>            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <!-- JavaScript files-->
+  </body>
+</html>

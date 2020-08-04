@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <!--使用log4j作为日志输出 -->
+        <setting name="logImpl" value="LOG4J"/>
+        <!--设置session执行指令的超时时间-->
+        <setting name="defaultStatementTimeout" value="3"/>
+        <!--全局取消一级session共享缓存-->
+        <!--<setting name="localCacheScope" value="STATEMENT"/>-->
+        <!--当有关联查询时，被关联的对象可设置延迟加载-->
+        <setting name="lazyLoadingEnabled" value="true"/>
+    </settings>
+
+
+</configuration>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>博客管理</title>
+    <script src="../../js/jquery3.4.1.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.serializeJSON/2.9.0/jquery.serializejson.js"></script>
+
+    <style>
+        .blog_edit{
+            margin: 0 auto;
+        }
+        #form{
+            text-align: center;
+        }
+        #other{
+            margin: 0 auto;
+        }
+        #other{
+            width: 500px;
+            height: 300px;
+            background-color: white;
+            margin: 0 auto;
+        }
+
+    </style>
+    <script>
+
+        $(function () {
+            // 获取博客类型信息，用于下拉框的选择
+            $.ajax({
+                url:"/blogType/getAllType.do",
+                type:"get",
+                dataType:"json",
+                async:true,
+                success:function (data) {
+                    $(data).each(function (index,type) {
+                        $("select[name=blogTypeId]").append(`<option value="${type.blogTypeId}">${type.typeContent}</option>`)
+                    })
+                }
+            });
+            // 上传图片
+            $("#upload").click(function() {
+                var formData = new FormData();
+                formData.append('blogImage', $('#file')[0].files[0]);
+                $.ajax({
+                    url: "/blog/getImage.do",
+                    type: "POST",
+                    data: formData,
+                    /**
+                     *必须false才会自动加上正确的Content-Type
+                     */
+                    contentType: false,
+                    /**
+                     * 必须false才会避开jQuery对 formdata 的默认处理
+                     * XMLHttpRequest会对 formdata 进行正确的处理
+                     */
+                    processData: false,
+                    success: function (data) {
+                        //把数据加到存储图片路径的输入框
+                        var inputImage1 = $(":hidden[name=blogImage]").val();
+                        var inputImage2 = inputImage1+"&"+data;
+                        $(":hidden[name=blogImage]").val(inputImage2);
+                        //把图片数据加到blogContent
+                        var imgUrl = data;
+                        var blogContent = $(":hidden[name=blogContent]").val();
+                        // blogContent = blogContent+"<p><img src="+"+"upload+"/"+data+"\"">"
+
+                        blogContent =blogContent+"<p><img src="+ "\""+"upload/"+data+"\""+" "+"class="+"\""+"img-fluid"+"\""+"></p>";
+                        $(":hidden[name=blogContent]").val(blogContent);
+                        alert($(":hidden[name=blogContent]").val());
+
+                        alert("success");
+                    },
+                    error: function () {
+                        alert("上传失败！");
+
+                    }
+                })
+            });
+            //上传文本
+            $("#textBtn").click(function () {
+                //获得blogContent内的值
+                var blogContent = $(":hidden[name=blogContent]").val();
+                var texareaContent = $("#addtext").val();
+                alert(texareaContent);
+                blogContent = blogContent+"<p class='lead'>"+texareaContent+"</p>";
+                $(":hidden[name=blogContent]").val(blogContent);
+                alert($(":hidden[name=blogContent]").val());
+
+
+            });
+            //上传代码
+            $("#codeBtn").click(function () {
+                //获得blogContent内的值
+                var blogContent = $(":hidden[name=blogContent]").val();
+                var texareaContent = $("#addcode").val();
+                alert(texareaContent);
+
+                blogContent = blogContent+"<blockquote"+" "+"class="+"\""+"blockquote"+"\""+">"
+                +"<p>"+texareaContent+"</p>"+"</blockquote>";
+                $(":hidden[name=blogContent]").val(blogContent);
+                alert($(":hidden[name=blogContent]").val());
+
+            });
+            //上传副标题
+            $("#titleBtn").click(function () {
+                //获得blogContent内的值
+                var blogContent = $(":hidden[name=blogContent]").val();
+                var texareaContent = $("#addtitle").val();
+                alert(texareaContent);
+                blogContent = blogContent+"<h3>"+texareaContent+"</h3>";
+                $(":hidden[name=blogContent]").val(blogContent);
+                alert($(":hidden[name=blogContent]").val());
+
+            });
+
+            //保存博客到后台数据库
+            $("#add").click(function () {
+                //JSON.stringify JavaScript 对象转换为 JSON 字符串
+                var blog = JSON.stringify($("#form").serializeJSON());
+                $.ajax({
+                    url:"/blog/addBlog.do",
+                    type:"post",
+                    async:true,
+                    data:blog,
+                    contentType:"application/json;charset=utf-8",//告诉服务端消息主体是序列化后的 JSON字符串
+                    success:function (data) {
+                        if (data==1) {
+                            alert("添加成功!")
+                        }else {
+                            alert("添加失败！")
+                        }
+
+                    }
+
+                })
+            })
+            //取消 把图片删除
+            $("#exit").click(function () {
+                var imgUrl = $(":hidden[name=blogImage]").val();
+                alert(imgUrl);
+                $.ajax({
+                    type:"post",
+                    url:"/blog/deleteImg.do",
+                    async:true,
+                    data:{imgUrl:imgUrl},
+                    success:function (data) {
+                        if (data==1) {
+                            alert("取消成功!")
+                        }else {
+                            alert("取消失败！")
+                        }
+                    }
+
+
+
+                })
+            })
+            
+        })
+
+
+    </script>
+</head>
+<body>
+<div class="blog_edit">
+    <form id="form">
+        <h1 style="color: #0f6674">博客管理</h1>
+        <div>博客类型:<select name="blogTypeId">
+            <option value="">请选择</option>
+        </select></div>
+        <div>博客标签:<input type="text" name="blogSign"></div>
+        <div>博客标题:<input type="text" name="blogTitle"></div>
+        <div><input type="hidden" value="" name="blogContent"></div>
+        <div><input type="hidden" value="" name="blogImage"></div>
+        <input id="add" type="button" value="保存">
+    </form>
+</div>
+
+
+<div id="other">
+    <h3>添加副标题</h3>
+    <div>
+        <textarea id="addtitle" rows="3" cols="30"></textarea>
+        <input id="titleBtn" type="button" value="提交">
+    </div>
+    <div class="blog_edit">
+        <h3>上传图片:</h3>
+        <input id="file" type="file" name="blogImage"/>
+        <button id="upload">上传图片</button>
+    </div>
+    <h3>添加文章:</h3>
+    <div>
+        <textarea id="addtext" rows="16" cols="80"></textarea>
+        <input id="textBtn" type="button" value="提交">
+    </div>
+    <h3>添加代码:</h3>
+    <div>
+        <textarea id="addcode" rows="14" cols="80"></textarea>
+        <input id="codeBtn" type="button" value="提交">
+    </div>
+
+
+</div>
+<div>
+    <input type="button" value="取消" id="exit">
+</div>
+
+
+
+</body>
+</html>

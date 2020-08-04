@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.seecen.dao.ISubscribeDao">
+  <resultMap id="BaseResultMap" type="com.seecen.model.Subscribe">
+    <id column="s_id" jdbcType="INTEGER" property="sId" />
+    <id column="s_email" jdbcType="VARCHAR" property="sEmail" />
+    <result column="s_time" jdbcType="TIMESTAMP" property="sTime" />
+  </resultMap>
+  <delete id="deleteByPrimaryKey" parameterType="map">
+    delete from blogsubscribe
+    where s_id = #{sId,jdbcType=INTEGER}
+      and s_email = #{sEmail,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.seecen.model.Subscribe">
+    insert into blogsubscribe (s_id, s_email, s_time
+      )
+    values (#{sId,jdbcType=INTEGER}, #{sEmail,jdbcType=VARCHAR}, #{sTime,jdbcType=TIMESTAMP}
+      )
+  </insert>
+  <update id="updateByPrimaryKey" parameterType="com.seecen.model.Subscribe">
+    update blogsubscribe
+    set s_time = #{sTime,jdbcType=TIMESTAMP}
+    where s_id = #{sId,jdbcType=INTEGER}
+      and s_email = #{sEmail,jdbcType=VARCHAR}
+  </update>
+  <select id="selectByPrimaryKey" parameterType="map" resultMap="BaseResultMap">
+    select s_id, s_email, s_time
+    from blogsubscribe
+    where s_id = #{sId,jdbcType=INTEGER}
+      and s_email = #{sEmail,jdbcType=VARCHAR}
+  </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    select s_id, s_email, s_time
+    from blogsubscribe
+  </select>
+</mapper>
