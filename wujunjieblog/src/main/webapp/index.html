@@ -196,11 +196,23 @@
 
 
     </script>
+    <style>
+      #header {
+        position: fixed;
+        z-index: 9999;
+        width: 1600px;
+        height: 96px;
+      }
+      #content {
+        z-index: 100;
+      }
+    </style>
 
 
 
   </head>
   <body>
+  <div id="header">
     <header class="header">
       <!-- Main Navbar-->
       <nav class="navbar navbar-expand-lg">
@@ -247,6 +259,8 @@
         </div>
       </nav>
     </header>
+  </div>
+  <div id="content">
     <!-- Hero Section-->
     <section style="background: url(img/hero.jpg); background-size: cover; background-position: center center" class="hero">
       <div class="container">
@@ -456,6 +470,7 @@
         </div>
       </div>
     </footer>
+  </div>
     <!-- JavaScript files-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/popper.js/umd/popper.min.js"> </script>
