@@ -10,8 +10,8 @@
         </commentGenerator>
 
         <jdbcConnection driverClass="com.mysql.jdbc.Driver"
-                        connectionURL="jdbc:mysql://121.36.91.49/jblog?serverTimezone=Hongkong&amp;useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;nullCatalogMeansCurrent=true"
-                        userId="root" password="123456"
+                        connectionURL="jdbc:mysql:///jblog?serverTimezone=Hongkong&amp;useUnicode=true&amp;characterEncoding=utf8&amp;useSSL=false&amp;nullCatalogMeansCurrent=true"
+                        userId="root" password=""
         />
 
         <javaModelGenerator targetPackage="com.seecen.model" targetProject="src/main/java"/>
